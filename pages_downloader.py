@@ -5,6 +5,9 @@ from requests_futures.sessions import FuturesSession
 from typing import Iterator, Generator
 
 
+# TODO Maybe remove cookies by passing custom subclass of Session to FuturesSessions
+
+
 class PagesDownloader:
     """
     Downloads web pages concurrently and acts as an iterator over them
