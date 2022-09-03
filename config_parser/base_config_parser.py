@@ -1,0 +1,59 @@
+from __future__ import annotations
+from abc import ABC, abstractmethod
+from .parsed_config_types import (SelectBaseFun, FilterBaseFun, ActionBaseFun,
+                                  Config)
+
+
+# TODO Accept file descriptor in create_parser?
+
+
+class BaseConfigParser(ABC):
+    """
+    Base class for all config parsers.
+    """
+
+    @abstractmethod
+    def get_parsed_config(self: BaseConfigParser) -> Config:
+        """
+        Returns the fully parsed config in the correct format for the rest
+        of the program to process.
+
+        :return: The parsed config.
+        """
+
+        pass
+
+    @abstractmethod
+    def get_urls(self: BaseConfigParser) -> list[str]:
+        """
+        Return urls from config as list.
+        For performance reasons, this function should return the list of
+        urls even before before the config is parsed completely.
+
+        :return: The list of urls in the config.
+        """
+
+        pass
+
+    @staticmethod
+    @abstractmethod
+    def create_parser(config_path: str,
+                      select_funs: dict[str,SelectBaseFun],
+                      filter_funs: dict[str,FilterBaseFun],
+                      action_funs: dict[str,ActionBaseFun]
+                      ) -> BaseConfigParser:
+        """
+        Factory method to create a parser from a config file path.
+
+        :param config_path: The config file's path.
+        :param select_funs: Dictionary mapping select function names to the
+                            respective functions.
+        :param filter_funs: Dictionary mapping filter function names to the
+                            respective functions.
+        :param action_funs: Dictionary mapping action function names to the
+                            respective functions.
+
+        :return: The json config parser created from the given parameters.
+        """
+
+    pass
