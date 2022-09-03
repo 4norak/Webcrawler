@@ -6,6 +6,7 @@ from typing import Iterator, Generator
 
 
 # TODO Maybe remove cookies by passing custom subclass of Session to FuturesSessions
+# TODO Use __slots__
 
 
 class PagesDownloader:
@@ -24,6 +25,7 @@ class PagesDownloader:
 
     def __init__(self, urls: list[str], futures_session_kwargs: dict = {},
                  get_kwargs: dict = {}) -> None:
+
         # Session used to fetch web pages. Only stored to gracefully close it later
         self._session: FuturesSession = FuturesSession(*futures_session_kwargs)
         # Iterator over all Futures containing fully downloaded web pages
