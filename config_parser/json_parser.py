@@ -4,18 +4,18 @@ from json import load
 from requests.utils import requote_uri
 from bs4 import Tag
 from typing import Callable, Any, Type
-from .base_config_parser import BaseConfigParser
-from .parsed_config_types import (SelectBaseFun, FilterBaseFun, ActionBaseFun,
-                                  FiltersActions, TagFiltersActions, Config)
-from .json_config_types import JsonConf, JsonConfFA, JsonConfTFA, JsonConfFun
-from .json_config_errors import JSONConfigErrors
+from .base_parser import BaseParser
+from .parsed_types import (SelectBaseFun, FilterBaseFun, ActionBaseFun,
+                           FiltersActions, TagFiltersActions, Config)
+from .json_types import JsonConf, JsonConfFA, JsonConfTFA, JsonConfFun
+from .json_errors import JSONErrors
 
 
 # TODO Strings in different file
 # TODO Maybe add option to load config in background?
 
 
-class JSONConfigParser(BaseConfigParser):
+class JSONParser(BaseParser):
     """
     Class for parsing json config file in "default" format.
 
@@ -31,17 +31,17 @@ class JSONConfigParser(BaseConfigParser):
     __slots__ = ["_json_config", "_select_funs", "_filter_funs",
                  "_action_funs", "_executor", "_parsed_config_future"]
 
-    def __init__(self: JSONConfigParser, json_config: JsonConf,
+    def __init__(self: JSONParser, json_config: JsonConf,
                  select_funs: dict[str,SelectBaseFun],
                  filter_funs: dict[str,FilterBaseFun],
                  action_funs: dict[str,ActionBaseFun]) -> None:
 
-        if (errors := JSONConfigParser.check_json_config(json_config)):
+        if (errors := JSONParser.check_json_config(json_config)):
             raise ValueError("\n".join(errors))
 
         # Save values needed for config parsing and returning values needed
         # in rest of program
-        self._json_config = JSONConfigParser.merge_duplicate_urls(json_config)
+        self._json_config = JSONParser.merge_duplicate_urls(json_config)
         self._select_funs = select_funs
         self._filter_funs = filter_funs
         self._action_funs = action_funs
@@ -51,7 +51,7 @@ class JSONConfigParser(BaseConfigParser):
         # Start parsing config in background
         self._parsed_config_future = self._executor.submit(self.parse_config)
 
-    def parse_config(self: JSONConfigParser) -> None:
+    def parse_config(self: JSONParser) -> None:
         """
         Parse loaded config and return result.
 
@@ -61,14 +61,13 @@ class JSONConfigParser(BaseConfigParser):
         parsed_config: JsonConf = {}
         for url,tfa_list in self._json_config.items():
             # Parse each select-filter-action triple for url
-            parsed_config[url] = [JSONConfigParser.get_tfa(tfa,
-                                                           self._select_funs,
-                                                           self._filter_funs,
-                                                           self._action_funs)
+            parsed_config[url] = [JSONParser.get_tfa(tfa, self._select_funs,
+                                                     self._filter_funs,
+                                                     self._action_funs)
                                   for tfa in tfa_list]
         return parsed_config
 
-    def get_urls(self: JSONConfigParser) -> list[str]:
+    def get_urls(self: JSONParser) -> list[str]:
         """
         Return urls from config as list. Used to start fetching pages even
         before the config is parsed completely.
@@ -78,7 +77,7 @@ class JSONConfigParser(BaseConfigParser):
 
         return list(self._json_config.keys())
 
-    def get_parsed_config(self: JSONConfigParser) -> Config:
+    def get_parsed_config(self: JSONParser) -> Config:
         """
         Return the fully parsed config in a format expected by the rest
         of the program.
@@ -101,33 +100,33 @@ class JSONConfigParser(BaseConfigParser):
         """
 
         if not isinstance(fun, dict):
-            return [f"{path}: {JSONConfigErrors.NO_DICT.value}"]
+            return [f"{path}: {JSONErrors.NO_DICT.value}"]
 
         errors = []
 
         if "function" in fun.keys():
             if not isinstance(fun["function"], str):
                 errors.append(
-                        f"{path} -> function: {JSONConfigErrors.NO_STR.value}")
+                        f"{path} -> function: {JSONErrors.NO_STR.value}")
         else:
-            errors.append(f"{path}: {JSONConfigErrors.NO_KEY.value} `function`")
+            errors.append(f"{path}: {JSONErrors.NO_KEY.value} `function`")
         if "args" in fun.keys():
             if not isinstance(fun["args"], list):
                 errors.append(
-                        f"{path} -> args: {JSONConfigErrors.NO_LIST.value}")
+                        f"{path} -> args: {JSONErrors.NO_LIST.value}")
         else:
-            errors.append(f"{path}: {JSONConfigErrors.NO_KEY.value} `args`")
+            errors.append(f"{path}: {JSONErrors.NO_KEY.value} `args`")
         if "kwargs" in fun.keys():
             if not isinstance(fun["kwargs"], dict):
                 errors.append(
-                        f"{path} -> kwargs: {JSONConfigErrors.NO_DICT.value}")
+                        f"{path} -> kwargs: {JSONErrors.NO_DICT.value}")
         else:
-            errors.append(f"{path}: {JSONConfigErrors.NO_KEY.value} `kwargs`")
+            errors.append(f"{path}: {JSONErrors.NO_KEY.value} `kwargs`")
 
         for k in fun.keys():
             if k not in ["function", "args", "kwargs"]:
                 errors.append(
-                        f"{path}: {JSONConfigErrors.INV_KEY.value} `{k}`")
+                        f"{path}: {JSONErrors.INV_KEY.value} `{k}`")
 
         return errors
 
@@ -144,7 +143,7 @@ class JSONConfigParser(BaseConfigParser):
         """
 
         if not isinstance(fa, dict):
-            return [f"{path}: {JSONConfigErrors.NO_DICT}"]
+            return [f"{path}: {JSONErrors.NO_DICT}"]
 
         errors = []
 
@@ -152,18 +151,18 @@ class JSONConfigParser(BaseConfigParser):
             if k in fa.keys():
                 if isinstance(fa[k], list):
                     for i,f in enumerate(fa[k]):
-                        errors += JSONConfigParser.check_json_fun(f,
+                        errors += JSONParser.check_json_fun(f,
                                 f"{path} -> [k] -> {i}")
                 else:
                     errors.append(
-                            f"{path} -> {k}: {JSONConfigErrors.NO_LIST.value}")
+                            f"{path} -> {k}: {JSONErrors.NO_LIST.value}")
             else:
-                errors.append(f"{path}: {JSONConfigErrors.NO_KEY.value} `{k}`")
+                errors.append(f"{path}: {JSONErrors.NO_KEY.value} `{k}`")
 
         for k in fa.keys():
             if k not in ["filters", "actions"]:
                 errors.append(
-                        f"{path}: {JSONConfigErrors.INV_KEY.value} `{k}`")
+                        f"{path}: {JSONErrors.INV_KEY.value} `{k}`")
 
         return errors
 
@@ -180,32 +179,32 @@ class JSONConfigParser(BaseConfigParser):
         """
 
         if not isinstance(tfa, dict):
-            return [f"{path}: {JSONConfigErrors.NO_DICT.value}"]
+            return [f"{path}: {JSONErrors.NO_DICT.value}"]
 
         errors = []
 
         if "select-chain" in tfa.keys():
             if isinstance(tfa["select-chain"], list):
                 for i,f in enumerate(tfa["select-chain"]):
-                    errors += JSONConfigParser.check_json_fun(f,
+                    errors += JSONParser.check_json_fun(f,
                             f"{path} -> select-chain -> {i}")
             else:
-                errors.append(f"{path} -> select-chain: {JSONConfigErrors.NO_LIST.value}")
+                errors.append(f"{path} -> select-chain: {JSONErrors.NO_LIST.value}")
         else:
-            errors.append(f"{path}: {JSONConfigErrors.NO_KEY.value} `select-chain`")
+            errors.append(f"{path}: {JSONErrors.NO_KEY.value} `select-chain`")
         if "filters-actions-pairs" in tfa.keys():
             if isinstance(tfa["filters-actions-pairs"], list):
                 for i,fa in enumerate(tfa["filters-actions-pairs"]):
-                    errors += JSONConfigParser.check_json_fa(fa,
+                    errors += JSONParser.check_json_fa(fa,
                         f"{path} -> filters-actions-pairs -> {i}")
             else:
-                errors.append(f"{path} -> filters-actions-pairs: {JSONConfigErrors.NO_LIST.value}")
+                errors.append(f"{path} -> filters-actions-pairs: {JSONErrors.NO_LIST.value}")
         else:
-            errors.append(f"{path}: {JSONConfigErrors.NO_KEY.value} `filters-actions-pairs`")
+            errors.append(f"{path}: {JSONErrors.NO_KEY.value} `filters-actions-pairs`")
 
         for k in tfa.keys():
             if k not in ["select-chain", "filters-actions-pairs"]:
-                errors.append(f"{path}: {JSONConfigErrors.INV_KEY.value} `{k}`")
+                errors.append(f"{path}: {JSONErrors.INV_KEY.value} `{k}`")
 
         return errors
 
@@ -222,19 +221,19 @@ class JSONConfigParser(BaseConfigParser):
         # TODO Check by config scheme
 
         if not isinstance(json_config, dict):
-            return [f"toplevel: {JSONConfigErrors.NO_DICT}"]
+            return [f"toplevel: {JSONErrors.NO_DICT}"]
 
         errors = []
 
         for url,tfas in json_config.items():
             if not isinstance(url, str):
-                errors.append(f"toplevel: {JSONConfigErrors.NO_STR}")
+                errors.append(f"toplevel: {JSONErrors.NO_STR}")
             if not isinstance(tfas, list):
-                errors.append(f"toplevel -> {url}: {JSONConfigErrors.NO_LIST}")
+                errors.append(f"toplevel -> {url}: {JSONErrors.NO_LIST}")
                 continue
 
             for i,tfa in enumerate(tfas):
-                errors += JSONConfigParser.check_json_tfa(tfa, f"toplevel -> {url} -> {i}")
+                errors += JSONParser.check_json_tfa(tfa, f"toplevel -> {url} -> {i}")
 
         return errors
 
@@ -243,7 +242,7 @@ class JSONConfigParser(BaseConfigParser):
                       select_funs: dict[str,SelectBaseFun],
                       filter_funs: dict[str,FilterBaseFun],
                       action_funs: dict[str,ActionBaseFun]
-                      ) -> JSONConfigParser:
+                      ) -> JSONParser:
         """
         Factory method to create a parser from a config file path.
 
@@ -259,7 +258,7 @@ class JSONConfigParser(BaseConfigParser):
         """
 
         with open(config_path, "r") as file:
-            return JSONConfigParser(load(file), select_funs, filter_funs,
+            return JSONParser(load(file), select_funs, filter_funs,
                               action_funs)
 
     @staticmethod
@@ -287,7 +286,7 @@ class JSONConfigParser(BaseConfigParser):
 
         new_config = {}
         for url,tag_list in json_config.items():
-            n_url = JSONConfigParser.normalize_url(url)
+            n_url = JSONParser.normalize_url(url)
             if n_url != url:
                 # Duplicate found, save all under normalized url
                 # TODO Prevent duplicate tfas
@@ -327,7 +326,7 @@ class JSONConfigParser(BaseConfigParser):
         :return: The list of parsed functions.
         """
 
-        return [JSONConfigParser.create_single_arg_fun(fun_dict[fun_spec["function"]],
+        return [JSONParser.create_single_arg_fun(fun_dict[fun_spec["function"]],
             *fun_spec["args"], **fun_spec["kwargs"])
             for fun_spec in fun_specs]
 
@@ -348,15 +347,15 @@ class JSONConfigParser(BaseConfigParser):
         """
 
         try:
-            filters = JSONConfigParser.parse_funs(config_entry["filters"],
-                                                  filter_funs)
+            filters = JSONParser.parse_funs(config_entry["filters"],
+                                            filter_funs)
         except KeyError as e:
-            raise ValueError(f"{e.args[0]}: {JSONConfigErrors.INV_FUN} in filter functions")
+            raise ValueError(f"{e.args[0]}: {JSONErrors.INV_FUN} in filter functions")
         try:
-            actions = JSONConfigParser.parse_funs(config_entry["actions"],
-                                                  action_funs)
+            actions = JSONParser.parse_funs(config_entry["actions"],
+                                            action_funs)
         except KeyError as e:
-            raise ValueError(f"{e.args[0]}: {JSONConfigErrors.INV_FUN} in action functions")
+            raise ValueError(f"{e.args[0]}: {JSONErrors.INV_FUN} in action functions")
 
         return FiltersActions(filters=filters, actions=actions)
 
@@ -380,12 +379,11 @@ class JSONConfigParser(BaseConfigParser):
         """
 
         try:
-            selects = JSONConfigParser.parse_funs(config_entry["select-chain"],
-                                                  select_funs)
+            selects = JSONParser.parse_funs(config_entry["select-chain"],
+                                            select_funs)
         except KeyError as e:
-            raise ValueError(f"{e.args[0]}: {JSONConfigErrors.INV_FUN} in select functions")
-        filters_actions = [JSONConfigParser.get_fa(ce, filter_funs,
-                                                   action_funs)
+            raise ValueError(f"{e.args[0]}: {JSONErrors.INV_FUN} in select functions")
+        filters_actions = [JSONParser.get_fa(ce, filter_funs, action_funs)
                            for ce in config_entry["filters-actions-pairs"]]
         return TagFiltersActions(select=selects,
                                  filters_actions=filters_actions)

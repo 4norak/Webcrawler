@@ -1,6 +1,6 @@
 from enum import Enum
 
-class JSONConfigErrors(Enum):
+class JSONErrors(Enum):
     """
     Error values for json config validation.
     """

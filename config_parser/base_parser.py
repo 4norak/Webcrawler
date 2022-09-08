@@ -1,19 +1,18 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from .parsed_config_types import (SelectBaseFun, FilterBaseFun, ActionBaseFun,
-                                  Config)
+from .parsed_types import SelectBaseFun, FilterBaseFun, ActionBaseFun, Config
 
 
 # TODO Accept file descriptor in create_parser?
 
 
-class BaseConfigParser(ABC):
+class BaseParser(ABC):
     """
     Base class for all config parsers.
     """
 
     @abstractmethod
-    def get_parsed_config(self: BaseConfigParser) -> Config:
+    def get_parsed_config(self: BaseParser) -> Config:
         """
         Returns the fully parsed config in the correct format for the rest
         of the program to process.
@@ -21,10 +20,10 @@ class BaseConfigParser(ABC):
         :return: The parsed config.
         """
 
-        pass
+        raise NotImplementedError()
 
     @abstractmethod
-    def get_urls(self: BaseConfigParser) -> list[str]:
+    def get_urls(self: BaseParser) -> list[str]:
         """
         Return urls from config as list.
         For performance reasons, this function should return the list of
@@ -33,7 +32,7 @@ class BaseConfigParser(ABC):
         :return: The list of urls in the config.
         """
 
-        pass
+        raise NotImplementedError()
 
     @staticmethod
     @abstractmethod
@@ -41,7 +40,7 @@ class BaseConfigParser(ABC):
                       select_funs: dict[str,SelectBaseFun],
                       filter_funs: dict[str,FilterBaseFun],
                       action_funs: dict[str,ActionBaseFun]
-                      ) -> BaseConfigParser:
+                      ) -> BaseParser:
         """
         Factory method to create a parser from a config file path.
 
@@ -56,4 +55,4 @@ class BaseConfigParser(ABC):
         :return: The json config parser created from the given parameters.
         """
 
-    pass
+        raise NotImplementedError()
