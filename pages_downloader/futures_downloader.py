@@ -1,15 +1,18 @@
 from __future__ import annotations
+
 from concurrent.futures import as_completed
 from concurrent.futures._base import Future
 from requests_futures.sessions import FuturesSession
 from typing import Iterator, Generator
+
+from .base_downloader import BaseDownloader
 
 
 # TODO Maybe remove cookies by passing custom subclass of Session to FuturesSessions
 # TODO Use __slots__
 
 
-class FuturesDownloader:
+class FuturesDownloader(BaseDownloader):
     """
     Downloads web pages concurrently and acts as an iterator over them
     The download starts as soon as the object is created. The iterator
