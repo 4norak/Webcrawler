@@ -9,13 +9,13 @@ from typing import Iterator, Generator
 # TODO Use __slots__
 
 
-class PagesDownloader:
+class FuturesDownloader:
     """
     Downloads web pages concurrently and acts as an iterator over them
     The download starts as soon as the object is created. The iterator
     blocks and returns the next result as soon as it is available.
 
-    PagesDownloader(urls: list[str], futures_session_kwargs: dict = {})
+    FuturesDownloader(urls: list[str], futures_session_kwargs: dict = {})
 
     :param urls: The list of urls to download the web pages from.
     :param futures_session_kwargs: Passed to
@@ -29,9 +29,11 @@ class PagesDownloader:
         # Session used to fetch web pages. Only stored to gracefully close it later
         self._session: FuturesSession = FuturesSession(*futures_session_kwargs)
         # Iterator over all Futures containing fully downloaded web pages
-        self._complete_futures: Iterator[Future] = as_completed(
-            [self._session.get(u, **get_kwargs) for u in urls]
-        )
+        futures = []
+        for u in urls:
+            f = (self._session.get(u, **get_kwargs))
+            f.original_url = u
+        self._complete_futures: Iterator[Future] = as_completed(futures)
 
     def close(self) -> None:
         """
@@ -41,10 +43,7 @@ class PagesDownloader:
         # Close used session with all open connections
         self._session.close()
 
-    def _create_generator(self) -> Generator[Future,None,None]:
-        yield from self._complete_futures
-
-    def __enter__(self) -> PagesDownloader:
+    def __enter__(self) -> FuturesDownloader:
         return self
 
     def __exit__(self, *args) -> None:
