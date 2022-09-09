@@ -1,5 +1,6 @@
 from typing import TypeVar, Union
 
+
 JsonElement = TypeVar("JsonElement", str, int, bool, list["JsonElement"],
                    dict[str,"JsonElement"])
 JsonConfFun = dict[str,Union[str,list[JsonElement],dict[str,JsonElement]]]

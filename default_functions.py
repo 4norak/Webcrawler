@@ -1,8 +1,10 @@
 from bs4 import Tag as _Tag
 from re import match as _match, search as _search
 
+
 def _getitem(tag, item):
     return tag[item]
+
 
 # Select Functions must return bs4.Tag or List of bs4.Tag
 SELECT_FUNCTIONS = {

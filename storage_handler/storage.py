@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+
 class Storage:
     """
     Storage class for stored pages.

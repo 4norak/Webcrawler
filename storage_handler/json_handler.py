@@ -5,6 +5,7 @@ from json import load, dump
 from .base_handler import BaseHandler
 from .storage import Storage
 
+
 class JSONHandler(BaseHandler):
     """
     Class for loading json storages.

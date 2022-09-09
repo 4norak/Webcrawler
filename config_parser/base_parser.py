@@ -1,5 +1,7 @@
 from __future__ import annotations
+
 from abc import ABC, abstractmethod
+
 from .parsed_types import SelectBaseFun, FilterBaseFun, ActionBaseFun, Config
 
 
@@ -39,8 +41,7 @@ class BaseParser(ABC):
     def create_parser(config_path: str,
                       select_funs: dict[str,SelectBaseFun],
                       filter_funs: dict[str,FilterBaseFun],
-                      action_funs: dict[str,ActionBaseFun]
-                      ) -> BaseParser:
+                      action_funs: dict[str,ActionBaseFun]) -> BaseParser:
         """
         Factory method to create a parser from a config file path.
 

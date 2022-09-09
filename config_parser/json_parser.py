@@ -1,9 +1,11 @@
 from __future__ import annotations
+
+from typing import Callable, Any, Type
 from concurrent.futures import ThreadPoolExecutor
 from json import load
 from requests.utils import requote_uri
 from bs4 import Tag
-from typing import Callable, Any, Type
+
 from .base_parser import BaseParser
 from .parsed_types import (SelectBaseFun, FilterBaseFun, ActionBaseFun,
                            FiltersActions, TagFiltersActions, Config)
@@ -241,8 +243,7 @@ class JSONParser(BaseParser):
     def create_parser(config_path: str,
                       select_funs: dict[str,SelectBaseFun],
                       filter_funs: dict[str,FilterBaseFun],
-                      action_funs: dict[str,ActionBaseFun]
-                      ) -> JSONParser:
+                      action_funs: dict[str,ActionBaseFun]) -> JSONParser:
         """
         Factory method to create a parser from a config file path.
 
@@ -331,8 +332,7 @@ class JSONParser(BaseParser):
             for fun_spec in fun_specs]
 
     @staticmethod
-    def get_fa(config_entry: JsonConfFA,
-               filter_funs: dict[str,FilterBaseFun],
+    def get_fa(config_entry: JsonConfFA, filter_funs: dict[str,FilterBaseFun],
                action_funs: dict[str,ActionBaseFun]) -> FiltersActions:
         """
         Parse and return a filter-action pair from a config entry.
