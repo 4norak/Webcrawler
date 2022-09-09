@@ -1,8 +1,16 @@
+from typing import Any
 from bs4 import Tag as _Tag
 from re import match as _match, search as _search
 
 
-def _getitem(tag, item):
+def _getitem(tag: Tag, item: str) -> Any:
+    """
+    Return a tag attribute by name.
+
+    :param tag: The tag the attribute belongs to.
+    :param item: The attribute's name.
+    """
+
     return tag[item]
 
 

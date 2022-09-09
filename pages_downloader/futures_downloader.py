@@ -3,7 +3,7 @@ from __future__ import annotations
 from concurrent.futures import as_completed
 from concurrent.futures._base import Future
 from requests_futures.sessions import FuturesSession
-from typing import Iterator, Generator
+from typing import Iterator, Generator, Any
 
 from .base_downloader import BaseDownloader
 
@@ -26,8 +26,9 @@ class FuturesDownloader(BaseDownloader):
     FuturesSession is used internally to download the web pages.
     """
 
-    def __init__(self, urls: list[str], futures_session_kwargs: dict = {},
-                 get_kwargs: dict = {}) -> None:
+    def __init__(self: FuturesDownloader, urls: list[str],
+                 futures_session_kwargs: dict = {}, get_kwargs: dict = {}
+                 ) -> None:
 
         # Session used to fetch web pages. Only stored to gracefully close it later
         self._session: FuturesSession = FuturesSession(*futures_session_kwargs)
@@ -38,7 +39,7 @@ class FuturesDownloader(BaseDownloader):
             f.original_url = u
         self._complete_futures: Iterator[Future] = as_completed(futures)
 
-    def close(self) -> None:
+    def close(self: FuturesDownloader) -> None:
         """
         Closes all open connections.
         """
@@ -46,14 +47,30 @@ class FuturesDownloader(BaseDownloader):
         # Close used session with all open connections
         self._session.close()
 
-    def __enter__(self) -> FuturesDownloader:
+    def __enter__(self: FuturesDownloader) -> FuturesDownloader:
+        """
+        Enable use in contexts.
+        """
+
         return self
 
-    def __exit__(self, *args) -> None:
+    def __exit__(self: FuturesDownloader, *args: Any) -> None:
+        """
+        Enable use in contexts.
+        """
+
         self.close()
 
-    def __iter__(self) -> Generator[Future,None,None]:
+    def __iter__(self: FuturesDownloader) -> Generator[Future,None,None]:
+        """
+        Enable conversion to iterator.
+        """
+
         yield from self._complete_futures
 
-    def __next__(self) -> Future:
+    def __next__(self: FuturesDownloader) -> Future:
+        """
+        Enable use as iterable.
+        """
+
         return next(iter(self))

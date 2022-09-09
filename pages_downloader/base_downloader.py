@@ -5,6 +5,9 @@ from concurrent.futures._base import Future
 from typing import Iterator, Generator
 
 
+# Remove requirement for page to be returned as Future
+
+
 class BaseDownloader(ABC):
     """
     Base class for all downloader classes.
