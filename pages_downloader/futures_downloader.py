@@ -15,28 +15,30 @@ from .base_downloader import BaseDownloader
 class FuturesDownloader(BaseDownloader):
     """
     Downloads web pages concurrently and acts as an iterator over them
-    The download starts as soon as the object is created. The iterator
+    The download starts as soon as init_download is called. The iterator
     blocks and returns the next result as soon as it is available.
-
-    FuturesDownloader(urls: list[str], futures_session_kwargs: dict = {})
-
-    :param urls: The list of urls to download the web pages from.
-    :param futures_session_kwargs: Passed to
-    requests_futures.sessions.FuturesSession.__init__ as kwargs.
-    FuturesSession is used internally to download the web pages.
     """
 
-    def __init__(self: FuturesDownloader, urls: list[str],
-                 futures_session_kwargs: dict = {}, get_kwargs: dict = {}
-                 ) -> None:
+    def init_download(self: FuturesDownloader, urls: list[str],
+                      futures_session_kwargs: dict = {}, get_kwargs: dict = {}
+                     ) -> None:
+        """
+        Initialize and start the downloader with the respective URLs and
+        arguments.
+
+        :param urls: The list of urls to download the web pages from.
+        :param futures_session_kwargs: Passed to
+        requests_futures.sessions.FuturesSession.__init__ as kwargs.
+        FuturesSession is used internally to download the web pages.
+        """
 
         # Session used to fetch web pages. Only stored to gracefully close it later
         self._session: FuturesSession = FuturesSession(*futures_session_kwargs)
         # Iterator over all Futures containing fully downloaded web pages
         futures = []
         for u in urls:
-            f = (self._session.get(u, **get_kwargs))
-            f.original_url = u
+            futures.append(self._session.get(u, **get_kwargs))
+            futures[-1].original_url = u
         self._complete_futures: Iterator[Future] = as_completed(futures)
 
     def close(self: FuturesDownloader) -> None:
