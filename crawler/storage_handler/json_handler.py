@@ -26,7 +26,7 @@ class JSONHandler(BaseHandler):
         assert storage_path, "Invalid path"
 
         with open(storage_path, "w") as file:
-            dump(storage_path, dict((url, soup.prettify()) for url, soup in self._pages.items()))
+            dump(dict((url, soup.prettify()) for url, soup in storage), file)
 
     @staticmethod
     def load_storage(storage_path: str) -> Storage:
