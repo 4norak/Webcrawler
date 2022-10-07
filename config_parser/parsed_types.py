@@ -1,8 +1,8 @@
-from typing import NamedTuple, Callable, Union
+from typing import NamedTuple, Callable, Union, Any
 from bs4 import Tag
 
 
-SelectBaseFun = Callable[...,Union[Tag,list[Tag]]]
+SelectBaseFun = Callable[...,Any]
 FilterBaseFun = Callable[...,bool]
 ActionBaseFun = Callable[...,None]
 

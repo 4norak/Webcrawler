@@ -14,6 +14,7 @@ from .json_errors import JSONErrors
 
 
 # TODO Strings in different file
+# TODO Mix selects and filters to allow filter on tags other than the final tag
 # TODO Maybe add option to load config in background?
 
 
@@ -288,10 +289,7 @@ class JSONParser(BaseParser):
         new_config = {}
         for url,tag_list in json_config.items():
             n_url = JSONParser.normalize_url(url)
-            if n_url != url:
-                # Duplicate found, save all under normalized url
-                # TODO Prevent duplicate tfas
-                new_config[n_url] = new_config.get(n_url, []) + tag_list
+            new_config[n_url] = new_config.get(n_url, []) + tag_list
 
         return new_config
 
