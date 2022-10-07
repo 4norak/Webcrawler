@@ -1,4 +1,5 @@
 from __future__ import annotations
+from bs4 import BeautifulSoup
 
 
 class Storage:
@@ -43,3 +44,24 @@ class Storage:
         assert isinstance(page, BeautifulSoup), "The page has to be a BeautifulSoup object"
 
         self._pages[url] = page
+
+    def __iter__(self):
+        """
+        Enable conversion to iterator.
+        """
+
+        return iter(self._pages.items())
+
+    def __next__(self):
+        """
+        Enable use as iterable.
+        """
+
+        if not hasattr(self.__next__, "it"):
+            self.__next__.it = iter(self._pages.items())
+
+        try:
+            return next(self.__next__.it)
+        except StopIteration as e:
+            del self.__next__.it
+            raise e
