@@ -13,8 +13,6 @@ class BaseDownloader(ABC):
     Base class for all downloader classes.
     """
 
-
-    # TODO Avoid collisions in args and kwargs
     @abstractmethod
     def init_download(self: BaseDownloader, urls: list[str], *args: Any,
                       **kwargs: Any) -> None:
@@ -45,7 +43,8 @@ class BaseDownloader(ABC):
     @abstractmethod
     def __iter__(self: BaseDownloader) -> Iterator[Future]:
         """
-        Enable conversion to iterator.
+        Enable conversion to iterator. Must return iterator from the
+        start in concurrent calls.
         """
 
         raise NotImplementedError()
@@ -53,7 +52,7 @@ class BaseDownloader(ABC):
     @abstractmethod
     def __next__(self: BaseDownloader) -> Future:
         """
-        Enable use as iterable.
+        Enable use as iterable. Must be reusable after last element
         """
 
         raise NotImplementedError()

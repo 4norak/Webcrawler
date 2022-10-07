@@ -39,7 +39,7 @@ class FuturesDownloader(BaseDownloader):
         for u in urls:
             futures.append(self._session.get(u, **get_kwargs))
             futures[-1].original_url = u
-        self._complete_futures: Iterator[Future] = as_completed(futures)
+        self._futures: Iterator[Future] = futures
 
     def close(self: FuturesDownloader) -> None:
         """
@@ -68,11 +68,18 @@ class FuturesDownloader(BaseDownloader):
         Enable conversion to iterator.
         """
 
-        yield from self._complete_futures
+        return as_completed(self._futures)
 
     def __next__(self: FuturesDownloader) -> Future:
         """
         Enable use as iterable.
         """
 
-        return next(iter(self))
+        if not hasattr(self.__next__, "it"):
+            self.__next__.it = as_completed(self._futures)
+
+        try:
+            return next(self.__next__.it)
+        except StopIteration as e:
+            del self.__next__.it
+            raise e
