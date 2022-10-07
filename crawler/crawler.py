@@ -62,6 +62,16 @@ class Crawler:
                         for action in fa.actions:
                             action(tag)
 
+    def new_pages_storage(self: Crawler):
+        storage = {}
+        with self._pages_downloader as pd:
+            for future in pd:
+                try:
+                    storage[future.original_url] = future.result().text
+                except Exception as e:
+                    storage[future.original_url] = self._storage[future.original_url]
+        return Storage(storage)
+
     @staticmethod
     def get_tag(base: Tag, select: list[SelectFun]):
         for f in select:
