@@ -9,7 +9,7 @@ class Storage:
     """
 
     def __init__(self: Storage, pages_dict: dict[str,str]) -> None:
-        self._pages = dict((url, BeautifulSoup(html))
+        self._pages = dict((url, BeautifulSoup(html, features="lxml"))
                            for url, html in pages_dict.items())
 
     def export(self: Storage) -> dict[str,str]:
