@@ -9,6 +9,9 @@ from .pages_downloader import BaseDownloader
 from .storage_handler import Storage
 
 
+# TODO: Proper handling of missing tags
+
+
 class Crawler:
     """
     Crawler to check websites for updates.
@@ -54,7 +57,7 @@ class Crawler:
                     except Exception as e:
                         old_tag = None
 
-                    if old_tag == tag:
+                    if old_tag and tag and old_tag.prettify() == tag.prettify():
                         continue
                     for fa in tfa.filters_actions:
                         if not all(map(lambda f: f(tag), fa.filters)):
@@ -69,7 +72,7 @@ class Crawler:
                 try:
                     storage[future.original_url] = future.result().text
                 except Exception as e:
-                    storage[future.original_url] = self._storage[future.original_url]
+                    storage[future.original_url] = self._storage[future.original_url].prettify()
         return Storage(storage)
 
     @staticmethod
