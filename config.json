@@ -1,0 +1,99 @@
+{
+    "https://heise.de":
+    [
+        {
+            "select-chain":
+            [
+                {
+                    "function": "find_all",
+                    "args": ["div"],
+                    "kwargs": {}
+                },
+                {
+                    "function": "[]",
+                    "args": [1],
+                    "kwargs": {}
+                },
+                {
+                    "function": "find",
+                    "args": ["svg"],
+                    "kwargs": {}
+                },
+                {
+                    "function": "find",
+                    "args": ["title"],
+                    "kwargs": {}
+                }
+            ],
+            "filters-actions-pairs":
+            [
+                {
+                    "filters":
+                    [
+                    ],
+                    "actions":
+                    [
+                        {
+                            "function": "print_tag",
+                            "args": [" - item found"],
+                            "kwargs": {}
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "https://duckduckgo.com":
+    [
+        {
+            "select-chain":
+            [
+            ],
+            "filters-actions-pairs":
+            [
+                {
+                    "filters":
+                    [
+                    ],
+                    "actions":
+                    [
+                    ]
+                }
+            ]
+        }
+    ],
+    "https://lite.duckduckgo.com":
+    [
+        {
+            "select-chain":
+            [
+                {
+                    "function": "find",
+                    "args": ["form"],
+                    "kwargs": {"attrs": {"method": "post"}}
+                }
+            ],
+            "filters-actions-pairs":
+            [
+                {
+                    "filters":
+                    [
+                        {
+                            "function": "re_search",
+                            "args": ["<input\\s+([^>]+\\s)?type=\"submit\"(\\s[^>]*)?>"],
+                            "kwargs": {}
+                        }
+                    ],
+                    "actions":
+                    [
+                        {
+                            "function": "print_no_tag",
+                            "args": ["found submit button"],
+                            "kwargs": {}
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
