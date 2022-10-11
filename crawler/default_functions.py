@@ -14,7 +14,8 @@ def getitem(tag: Tag, item: str) -> Any:
     return tag[item]
 
 
-# Select Functions must return bs4.Tag or List of bs4.Tag
+# Select functions can return anything but will be chained, so the next
+# function has to be able to handle the previous function's output
 SELECT_FUNCTIONS = {
     "select": Tag.select,
     "find": Tag.find,
