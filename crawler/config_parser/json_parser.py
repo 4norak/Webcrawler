@@ -7,7 +7,7 @@ from requests.utils import requote_uri
 from bs4 import Tag
 
 from .base_parser import BaseParser
-from .parsed_types import (SelectBaseFun, FilterBaseFun, ActionBaseFun,
+from .parsed_types import (SelectFun, FilterFun, ActionFun,
                            FiltersActions, TagFiltersActions, Config)
 from .json_types import JsonConf, JsonConfFA, JsonConfTFA, JsonConfFun
 from .json_errors import JSONErrors
@@ -35,9 +35,9 @@ class JSONParser(BaseParser):
                  "_action_funs", "_executor", "_parsed_config_future"]
 
     def __init__(self: JSONParser, json_config: JsonConf,
-                 select_funs: dict[str,SelectBaseFun],
-                 filter_funs: dict[str,FilterBaseFun],
-                 action_funs: dict[str,ActionBaseFun]) -> None:
+                 select_funs: dict[str,SelectFun],
+                 filter_funs: dict[str,FilterFun],
+                 action_funs: dict[str,ActionFun]) -> None:
 
         if (errors := JSONParser.check_json_config(json_config)):
             raise ValueError("\n".join(errors))
@@ -242,9 +242,9 @@ class JSONParser(BaseParser):
 
     @staticmethod
     def create_parser(config_path: str,
-                      select_funs: dict[str,SelectBaseFun],
-                      filter_funs: dict[str,FilterBaseFun],
-                      action_funs: dict[str,ActionBaseFun]) -> JSONParser:
+                      select_funs: dict[str,SelectFun],
+                      filter_funs: dict[str,FilterFun],
+                      action_funs: dict[str,ActionFun]) -> JSONParser:
         """
         Factory method to create a parser from a config file path.
 
@@ -330,8 +330,8 @@ class JSONParser(BaseParser):
             for fun_spec in fun_specs]
 
     @staticmethod
-    def get_fa(config_entry: JsonConfFA, filter_funs: dict[str,FilterBaseFun],
-               action_funs: dict[str,ActionBaseFun]) -> FiltersActions:
+    def get_fa(config_entry: JsonConfFA, filter_funs: dict[str,FilterFun],
+               action_funs: dict[str,ActionFun]) -> FiltersActions:
         """
         Parse and return a filter-action pair from a config entry.
 
@@ -359,9 +359,9 @@ class JSONParser(BaseParser):
 
     @staticmethod
     def get_tfa(config_entry: JsonConfTFA,
-                select_funs: dict[str,SelectBaseFun],
-                filter_funs: dict[str,FilterBaseFun],
-                action_funs: dict[str,ActionBaseFun]) -> TagFiltersActions:
+                select_funs: dict[str,SelectFun],
+                filter_funs: dict[str,FilterFun],
+                action_funs: dict[str,ActionFun]) -> TagFiltersActions:
         """
         Parse and return a tag-filter-action triple from a config entry.
 

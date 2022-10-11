@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from .parsed_types import SelectBaseFun, FilterBaseFun, ActionBaseFun, Config
+from .parsed_types import SelectFun, FilterFun, ActionFun, Config
 
 
 # TODO Accept file descriptor in create_parser?
@@ -39,9 +39,9 @@ class BaseParser(ABC):
     @staticmethod
     @abstractmethod
     def create_parser(config_path: str,
-                      select_funs: dict[str,SelectBaseFun],
-                      filter_funs: dict[str,FilterBaseFun],
-                      action_funs: dict[str,ActionBaseFun]) -> BaseParser:
+                      select_funs: dict[str,SelectFun],
+                      filter_funs: dict[str,FilterFun],
+                      action_funs: dict[str,ActionFun]) -> BaseParser:
         """
         Factory method to create a parser from a config file path.
 

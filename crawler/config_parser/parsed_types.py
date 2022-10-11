@@ -2,11 +2,7 @@ from typing import NamedTuple, Callable, Union, Any
 from bs4 import Tag
 
 
-SelectBaseFun = Callable[...,Any]
-FilterBaseFun = Callable[...,bool]
-ActionBaseFun = Callable[...,None]
-
-SelectFun = Callable[[Tag],Union[Tag,list[Tag]]]
+SelectFun = Callable[[Any],Any]
 FilterFun = Callable[[Tag],bool]
 ActionFun = Callable[[Tag],None]
 
