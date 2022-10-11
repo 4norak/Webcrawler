@@ -3,8 +3,8 @@ from bs4 import Tag
 
 
 SelectFun = Callable[[Any],Any]
-FilterFun = Callable[[Tag],bool]
-ActionFun = Callable[[Tag],None]
+FilterFun = Callable[[tuple[Tag,Tag]],bool]
+ActionFun = Callable[[tuple[Tag,Tag]],None]
 
 FiltersActions = NamedTuple( # TODO Find better name
     "FiltersActions",

@@ -60,10 +60,10 @@ class Crawler:
                     if old_tag and tag and old_tag.prettify() == tag.prettify():
                         continue
                     for fa in tfa.filters_actions:
-                        if not all(map(lambda f: f(tag), fa.filters)):
+                        if not all(map(lambda f: f((tag,old_tag,)), fa.filters)):
                             continue
                         for action in fa.actions:
-                            action(tag)
+                            action((tag,old_tag,))
 
     def new_pages_storage(self: Crawler):
         storage = {}

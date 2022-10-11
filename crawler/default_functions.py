@@ -36,17 +36,18 @@ SELECT_FUNCTIONS = {
 
 # Filter functions must return a boolean
 FILTER_FUNCTIONS = {
-    "re_match": (lambda tag,re: match(re,str(tag)) is not None),
-    "re_match_text": (lambda tag,re: match(re,tag.text) is not None),
-    "re_match_string": (lambda tag,re: match(re,tag.string) is not None),
-    "re_search": (lambda tag,re: search(re,str(tag)) is not None),
-    "re_search_text": (lambda tag,re: search(re,tag.text) is not None),
-    "re_search_string": (lambda tag,re: search(re,tag.string) is not None)
+    "re_match": (lambda tags,re: match(re,str(tags[0])) is not None),
+    "re_match_text": (lambda tags,re: match(re,tags[0].text) is not None),
+    "re_match_string": (lambda tags,re: match(re,tags[0].string) is not None),
+    "re_search": (lambda tags,re: search(re,str(tags[0])) is not None),
+    "re_search_text": (lambda tags,re: search(re,tags[0].text) is not None),
+    "re_search_string": (lambda tags,re: search(re,tags[0].string) is not None)
 }
 
 # Action functions should not return anything
 # If they do, the return value will be ignored
 ACTION_FUNCTIONS = {
-    "print_no_tag": (lambda tag,*args,**kwargs: print(*args, **kwargs)),
-    "print_tag": print
+    "print_no_tag": (lambda tags,*args,**kwargs: print(*args, **kwargs)),
+    "print_tag": (lambda tags,*args,**kwargs: print(tags[0], *args, **kwargs)),
+    "print_tags": (lambda tags,sep,*args,**kwargs: print(f"{tags[0]}{sep}{tags[1]}", *args, **kwargs))
 }
